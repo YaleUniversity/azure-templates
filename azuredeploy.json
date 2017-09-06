@@ -1,12 +1,43 @@
 {  
    "$schema":"http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
    "contentVersion":"1.0.0.0",
-   "variables":{  
-      "databaseSku":"Free",
-      "databaseName":"[concat(uniquestring(resourceGroup().id),'db')]",
-      "siteName":"[concat(uniquestring(resourceGroup().id),'website')]",
-      "aspName":"[concat(uniquestring(resourceGroup().id),'hostingplan')]",
-      "php5":"5.6"
+   "parameters": {
+      "ownerId":{
+         "type":"string",
+         "metadata":{
+            "description":"Owner identifier. Can be user initials or department abbreviation."
+         }
+       },
+      "phpVersion":{
+         "type":"string",
+         "defaultValue":"5.6",
+         "allowedValues":[
+            "5.6",
+            "7.0"
+         ],
+         "metadata":{
+            "description":"Supported versions of PHP"
+         }
+      },
+      "databaseSku":{
+         "type":"string",
+         "defaultValue": "Free",
+         "allowedValues":[
+            "Free",
+            "Titan",
+            "Venus",
+            "Saturn",
+            "Jupiter"
+         ],
+         "metadata": {
+            "description":"ClearDB MySQL plan. The default value is 'Mercury' (Free). For pricing see http://w2.cleardb.net/azure/"
+         }
+      }
+   },
+   "variables":{
+      "databaseName":"[concat(parameters('ownerId'),'-',uniquestring(resourceGroup().id),'-db')]",
+      "siteName":"[concat(parameters('ownerId'),'-',uniquestring(resourceGroup().id),'-web')]",
+      "aspName":"[concat(parameters('ownerId'),'-',uniquestring(resourceGroup().id),'-asp')]"
    },
    "resources":[  
       {  
@@ -14,7 +45,7 @@
          "name":"[variables('databaseName')]",
          "type":"SuccessBricks.ClearDB/databases",
          "plan":{  
-            "name":"[variables('databaseSku')]"
+            "name":"[parameters('databaseSku')]"
          },
          "location":"[resourceGroup().location]",
          "tags":{  
@@ -53,7 +84,7 @@
             "siteConfig":{  
                "properties":{  
                   "numberOfWorkers":"1",
-                  "phpVersion":"[variables('php5')]"
+                  "phpVersion":"[parameters('phpVersion')]"
                }
             },
             "maxNumberOfWorkers":"1"
@@ -82,7 +113,7 @@
                   "[concat('Microsoft.Web/sites/', variables('siteName'))]"
                ],
                "properties":{  
-                  "phpVersion":"[variables('php5')]"
+                  "phpVersion":"[parameters('phpVersion')]"
                }
             }
          ]
