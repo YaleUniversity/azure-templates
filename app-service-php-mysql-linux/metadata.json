@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "YII-based Application on App Service Linux(Preview)",
+  "description": "This template deploys an web application written with the YII PHP framework on App service Linux with ClearDB MySQL database",
+  "summary": "Deploys a YII web app on App Service Linux(preview) with ClearDB MySQL database. You may need a Credit card associated with your subscription in order to purchase ClearDB MySQL database",
+  "githubUsername": "git@yale.edu",
+  "dateUpdated": "2017-08-30"
+}

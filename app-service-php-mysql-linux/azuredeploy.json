@@ -1,0 +1,118 @@
+{  
+   "$schema":"http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+   "contentVersion":"1.0.0.0",
+   "parameters": {
+      "ownerId":{
+         "type":"string",
+         "metadata":{
+            "description":"Owner identifier. Can be user initials or department abbreviation."
+         }
+       },
+      "phpVersion":{
+         "type":"string",
+         "defaultValue":"5.6",
+         "allowedValues":[
+            "5.6",
+            "7.0"
+         ],
+         "metadata":{
+            "description":"Supported versions of PHP"
+         }
+      },
+      "databaseSku":{
+         "type":"string",
+         "defaultValue": "Free",
+         "allowedValues":[
+            "Free",
+            "Titan",
+            "Venus",
+            "Saturn",
+            "Jupiter"
+         ],
+         "metadata": {
+            "description":"ClearDB MySQL plan. The default value is 'Mercury' (Free). For pricing see http://w2.cleardb.net/azure/"
+         }
+      }
+   },
+   "variables":{
+      "databaseName":"[concat(parameters('ownerId'),'-',uniquestring(resourceGroup().id),'-db')]",
+      "siteName":"[concat(parameters('ownerId'),'-',uniquestring(resourceGroup().id),'-web')]",
+      "aspName":"[concat(parameters('ownerId'),'-',uniquestring(resourceGroup().id),'-asp')]"
+   },
+   "resources":[  
+      {  
+         "apiVersion":"2014-04-01",
+         "name":"[variables('databaseName')]",
+         "type":"SuccessBricks.ClearDB/databases",
+         "plan":{  
+            "name":"[parameters('databaseSku')]"
+         },
+         "location":"[resourceGroup().location]",
+         "tags":{  
+            "provision_source":"RMS"
+         }
+      },
+      {  
+         "apiVersion":"2016-09-01",
+         "name":"[variables('aspName')]",
+         "type":"Microsoft.Web/serverfarms",
+         "location":"[resourceGroup().location]",
+         "properties":{  
+            "maximumNumberOfWorkers":1,
+            "geoRegion":"[resourceGroup().location]",
+            "reserved":true,
+            "planName":"VirtualDedicatedPlan"
+         },
+         "sku":{  
+            "name":"B1"
+         }
+      },
+      {  
+         "apiVersion":"2015-08-01",
+         "name":"[variables('siteName')]",
+         "type":"Microsoft.Web/sites",
+         "location":"[resourceGroup().location]",
+         "dependsOn":[  
+            "[variables('aspName')]"
+         ],
+         "properties":{  
+            "serverFarmId":"[variables('aspName')]",
+            "siteConfig":{  
+               "properties":{  
+                  "numberOfWorkers":"1",
+                  "phpVersion":"[parameters('phpVersion')]"
+               }
+            },
+            "maxNumberOfWorkers":"1"
+         },
+         "resources":[  
+            {  
+               "apiVersion":"2015-08-01",
+               "name":"connectionstrings",
+               "type":"config",
+               "dependsOn":[  
+                  "[concat('Microsoft.Web/sites/', variables('siteName'))]",
+                  "[concat('SuccessBricks.ClearDB/databases/', variables('databaseName'))]"
+               ],
+               "properties":{  
+                  "defaultConnection":{  
+                     "value":"[reference(concat('SuccessBricks.ClearDB/databases/', variables('databaseName'))).connectionString]",
+                     "type":"MySql"
+                  }
+               }
+            },
+            {  
+               "apiVersion":"2015-08-01",
+               "type":"config",
+               "name":"web",
+               "dependsOn":[  
+                  "[concat('Microsoft.Web/sites/', variables('siteName'))]"
+               ],
+               "properties":{  
+                  "phpVersion":"[parameters('phpVersion')]"
+               }
+            }
+         ]
+      }
+   ]
+}
