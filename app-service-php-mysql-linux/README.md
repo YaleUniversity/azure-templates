@@ -1,15 +1,61 @@
 # app-service-php-mysql-linux
 
+This template will create the following resources in a specfied resource group. 
+
+* A PHP Application in Azure's App Service for Linux (Preview)
+* An Azure Application Service Plan which defines the compute resources to be allocated to the application.
+* A MySQL database in Azure's MySQL PaaS database service backed by [ClearDB](http://w2.cleardb.net/)
+
+The template accepts the following parameters:
+
+```json
+   "parameters": {
+      "ownerId":{
+         "type":"string",
+         "metadata":{
+            "description":"Owner identifier. Can be user initials or department abbreviation."
+         }
+       },
+      "phpVersion":{
+         "type":"string",
+         "defaultValue":"5.6",
+         "allowedValues":[
+            "5.6",
+            "7.0"
+         ],
+         "metadata":{
+            "description":"Supported versions of PHP"
+         }
+      },
+      "databaseSku":{
+         "type":"string",
+         "defaultValue": "Free",
+         "allowedValues":[
+            "Free",
+            "Titan",
+            "Venus",
+            "Saturn",
+            "Jupiter"
+         ],
+         "metadata": {
+            "description":"ClearDB MySQL plan. The default value is Free (Mercury). For pricing see http://w2.cleardb.net/azure/"
+         }
+      }
+   }
+```
+
+An Azure subscription is necessary to use this template. Any `databaseSku` except `Free` requires a credit card on file associated with the subscription or an enterprise agreement in place. (The cost of the database will be charged as an overage under an enterprise agreement.)
+
+Click the button below to view a graphical representation of this Azure Resource Manager Template:
+
+<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FYaleUniversity%2Fazure-templates%2Fmaster%2Fapp-service-php-mysql-linux%2Fazuredeploy.json" target="_blank">
+  <img src="http://armviz.io/visualizebutton.png"/>
+</a>
+
 ## Click to Deploy
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FYaleUniversity%2Fazure-templates%2Fmaster%2Fapp-service-php-mysql-linux%2Fazuredeploy.json" target="_blank">
   <img src="http://azuredeploy.net/deploybutton.png"/>
-</a>
-
-<br>
-
-<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FYaleUniversity%2Fazure-templates%2Fmaster%2Fapp-service-php-mysql-linux%2Fazuredeploy.json" target="_blank">
-  <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
 ## Deployment Via Azure CLI
@@ -45,9 +91,9 @@ $
 Create a new Azure Resource Group to manage the application, its app service plan, and MySQL database in the *East US 2* location.
 
 ```bash
-$ az group create --name '[netid]-[resource group name]-rg' --location 'eastus2'
+$ az group create --name '[ownerId]-[resource group name]-rg' --location 'eastus2'
 {
-  "id": "/subscriptions/[subscription guid]/resourceGroups/[netid]-[resource group name]-rg",
+  "id": "/subscriptions/[subscription guid]/resourceGroups/[ownerId]-[resource group name]-rg",
   "location": "eastus2",
   "managedBy": null,
   "name": "[resource group name]",
@@ -62,9 +108,9 @@ $
 Deploy a new PHP App Service application, App Service Plan, and MySQL database from the template.
 
 ```bash
-$ az group deployment create --name [name of deployment] --resource-group [netid]-[resource group name]-rg --template-file azuredeploy.json
+$ az group deployment create --name [name of deployment] --resource-group [ownerId]-[resource group name]-rg --template-file azuredeploy.json --parameters ownerId=[ownerId]
 {
-  "id": "/subscriptions/[subscription guid]/resourceGroups/[netid]-[resource group name]-rg/providers/Microsoft.Resources/deployments/veb-yiitstapp-deployment",
+  "id": "/subscriptions/[subscription guid]/resourceGroups/[ownerId]-[resource group name]-rg/providers/Microsoft.Resources/deployments/veb-yiitstapp-deployment",
   "name": "veb-yiitstapp-deployment",
   "properties": {
     "correlationId": "aea34f62-6ced-4fac-8a7a-2e40241aaed9",
@@ -73,48 +119,48 @@ $ az group deployment create --name [name of deployment] --resource-group [netid
       {
         "dependsOn": [
           {
-            "id": "/subscriptions/[subscription guid]/resourceGroups/[netid]-[resource group name]-rg/providers/Microsoft.Web/serverfarms/[hash from resource group id]hostingplan",
-            "resourceGroup": "[netid]-[resource group name]-rg",
+            "id": "/subscriptions/[subscription guid]/resourceGroups/[ownerId]-[resource group name]-rg/providers/Microsoft.Web/serverfarms/[hash from resource group id]hostingplan",
+            "resourceGroup": "[ownerId]-[resource group name]-rg",
             "resourceName": "[hash from resource group id]hostingplan",
             "resourceType": "Microsoft.Web/serverfarms"
           }
         ],
-        "id": "/subscriptions/[subscription guid]/resourceGroups/[netid]-[resource group name]-rg/providers/Microsoft.Web/sites/[hash from resource group id]website",
-        "resourceGroup": "[netid]-[resource group name]-rg",
+        "id": "/subscriptions/[subscription guid]/resourceGroups/[ownerId]-[resource group name]-rg/providers/Microsoft.Web/sites/[hash from resource group id]website",
+        "resourceGroup": "[ownerId]-[resource group name]-rg",
         "resourceName": "[hash from resource group id]website",
         "resourceType": "Microsoft.Web/sites"
       },
       {
         "dependsOn": [
           {
-            "id": "/subscriptions/[subscription guid]/resourceGroups/[netid]-[resource group name]-rg/providers/Microsoft.Web/sites/[hash from resource group id]website",
-            "resourceGroup": "[netid]-[resource group name]-rg",
+            "id": "/subscriptions/[subscription guid]/resourceGroups/[ownerId]-[resource group name]-rg/providers/Microsoft.Web/sites/[hash from resource group id]website",
+            "resourceGroup": "[ownerId]-[resource group name]-rg",
             "resourceName": "[hash from resource group id]website",
             "resourceType": "Microsoft.Web/sites"
           },
           {
-            "id": "/subscriptions/[subscription guid]/resourceGroups/[netid]-[resource group name]-rg/providers/SuccessBricks.ClearDB/databases/[hash from resource group id]db",
-            "resourceGroup": "[netid]-[resource group name]-rg",
+            "id": "/subscriptions/[subscription guid]/resourceGroups/[ownerId]-[resource group name]-rg/providers/SuccessBricks.ClearDB/databases/[hash from resource group id]db",
+            "resourceGroup": "[ownerId]-[resource group name]-rg",
             "resourceName": "[hash from resource group id]db",
             "resourceType": "SuccessBricks.ClearDB/databases"
           }
         ],
-        "id": "/subscriptions/[subscription guid]/resourceGroups/[netid]-[resource group name]-rg/providers/Microsoft.Web/sites/[hash from resource group id]website/config/connectionstrings",
-        "resourceGroup": "[netid]-[resource group name]-rg",
+        "id": "/subscriptions/[subscription guid]/resourceGroups/[ownerId]-[resource group name]-rg/providers/Microsoft.Web/sites/[hash from resource group id]website/config/connectionstrings",
+        "resourceGroup": "[ownerId]-[resource group name]-rg",
         "resourceName": "[hash from resource group id]website/connectionstrings",
         "resourceType": "Microsoft.Web/sites/config"
       },
       {
         "dependsOn": [
           {
-            "id": "/subscriptions/[subscription guid]/resourceGroups/[netid]-[resource group name]-rg/providers/Microsoft.Web/sites/[hash from resource group id]website",
-            "resourceGroup": "[netid]-[resource group name]-rg",
+            "id": "/subscriptions/[subscription guid]/resourceGroups/[ownerId]-[resource group name]-rg/providers/Microsoft.Web/sites/[hash from resource group id]website",
+            "resourceGroup": "[ownerId]-[resource group name]-rg",
             "resourceName": "[hash from resource group id]website",
             "resourceType": "Microsoft.Web/sites"
           }
         ],
-        "id": "/subscriptions/[subscription guid]/resourceGroups/[netid]-[resource group name]-rg/providers/Microsoft.Web/sites/[hash from resource group id]website/config/web",
-        "resourceGroup": "[netid]-[resource group name]-rg",
+        "id": "/subscriptions/[subscription guid]/resourceGroups/[ownerId]-[resource group name]-rg/providers/Microsoft.Web/sites/[hash from resource group id]website/config/web",
+        "resourceGroup": "[ownerId]-[resource group name]-rg",
         "resourceName": "[hash from resource group id]website/web",
         "resourceType": "Microsoft.Web/sites/config"
       }
@@ -180,7 +226,7 @@ $ az group deployment create --name [name of deployment] --resource-group [netid
     "templateLink": null,
     "timestamp": "2017-09-05T15:19:21.069496+00:00"
   },
-  "resourceGroup": "[netid]-[resource group name]-rg"
+  "resourceGroup": "[ownerId]-[resource group name]-rg"
 }
 ```
 
