@@ -30,7 +30,7 @@
             "Jupiter"
          ],
          "metadata": {
-            "description":"ClearDB MySQL plan. The default value is 'Mercury' (Free). For pricing see http://w2.cleardb.net/azure/"
+            "description":"ClearDB MySQL plan. The default value is Free (Mercury). For pricing see http://w2.cleardb.net/azure/"
          }
       }
    },
