@@ -6,6 +6,12 @@
   <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
+<br>
+
+<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FYaleUniversity%2Fazure-templates%2Fmaster%2Fapp-service-php-mysql-linux%2Fazuredeploy.json" target="_blank">
+  <img src="http://armviz.io/visualizebutton.png"/>
+</a>
+
 ## Deployment Via Azure CLI
 
 ```bash
